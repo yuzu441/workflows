@@ -1,19 +1,41 @@
 name: github-label-sync
 
 on:
-  push:
-    paths:
-      - .github/labels.yaml
-      - .github/workflows/github-label-sync.yaml
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      source_paths:
+        description: Label definition file paths (newline-separated). Multiple files are merged in order.
+        default: .github/labels/labels.yaml
+        required: false
+        type: string
+      source_repository:
+        description: GitHub repository to find labels definition file.
+        default: yuzu441/workflows
+        required: false
+        type: string
+      allow_added_labels:
+        description: Allow additional labels in the repository, and don't delete them.
+        default: false
+        required: false
+        type: boolean
+    secrets:
+      github_token:
+        description: |
+          GitHub access token to sync labels. Defaults to github.token if not provided.
+          Required when source_repository is a private repository other than the caller.
+        required: false
 
 permissions:
   contents: read
   issues: write
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/github-label-sync-action
+      - uses: yuzu441/workflows/.github/actions/github-label-sync-action@main
+        with:
+          source_paths: ${{ inputs.source_paths }}
+          source_repository: ${{ inputs.source_repository }}
+          allow_added_labels: ${{ inputs.allow_added_labels }}
+          github_token: ${{ secrets.github_token || github.token }}

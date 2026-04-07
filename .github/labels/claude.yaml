@@ -1,0 +1,6 @@
+- name: claude:implement
+  description: resolve issue then create pr.
+  color: "5319e7"
+- name: claude:fix
+  description: resolve pr comment.
+  color: "0052cc"

@@ -9,12 +9,12 @@ inputs:
     default: ${{ github.token }}
     description: GitHub access token to sync labels.
     required: false
-  source_path:
-    default: .github/labels.yaml
-    description: File path to find labels definition file.
+  source_paths:
+    default: .github/labels/labels.yaml
+    description: Label definition file paths (newline-separated). Multiple files are merged in order.
     required: false
   source_repository:
-    default: ${{ github.repository }}
+    default: yuzu441/workflows
     description: GitHub repository to find labels definition file.
     required: false
 runs:
@@ -24,12 +24,27 @@ runs:
       with:
         token: ${{ inputs.github_token }}
         repository: ${{ inputs.source_repository }}
-        sparse-checkout: ${{ inputs.source_path }}
+        sparse-checkout: .github/labels
+        path: .label-source
+    - name: Merge label files
+      id: merge
+      shell: bash
+      run: |
+        merged="/tmp/labels-merged.yaml"
+        > "$merged"
+        while IFS= read -r file; do
+          file=$(echo "$file" | xargs)
+          # ファイル間の改行を保証して YAML 連結時の破損を防ぐ
+          if [ -n "$file" ]; then
+            cat ".label-source/$file" >> "$merged"
+            echo "" >> "$merged"
+          fi
+        done <<< "${{ inputs.source_paths }}"
+        echo "config_file=$merged" >> "$GITHUB_OUTPUT"
     - uses: EndBug/label-sync@52074158190acb45f3077f9099fea818aa43f97a
       with:
-        config-file: ${{ inputs.source_path }}
+        config-file: ${{ steps.merge.outputs.config_file }}
         delete-other-labels: ${{ inputs.allow_added_labels == 'false' }}
-        dry-run: true
         token: ${{ inputs.github_token }}
 branding:
   color: orange
