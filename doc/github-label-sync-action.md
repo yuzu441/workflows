@@ -10,15 +10,15 @@ GitHubリポジトリのラベルをYAMLファイルで定義し、同期するr
 
 | 名前 | デフォルト | 型 | 説明 |
 |------|-----------|-----|------|
-| `source_paths` | `.github/labels/labels.yaml` | string | 適用するラベル定義ファイルのパス（改行区切りで複数指定可能）。複数指定した場合は順番に結合される |
-| `source_repository` | `yuzu441/workflows` | string | ラベル定義ファイルを取得するリポジトリ |
+| `source_paths` | `.github/labels/labels.yaml` | string | `source_repository` の `.github/labels/` 配下にあるラベル定義ファイルパス（改行区切りで複数指定可能）。複数指定した場合は順番に結合される |
+| `source_repository` | `yuzu441/workflows` | string | `source_paths` のパスを解決するリポジトリ |
 | `allow_added_labels` | `false` | boolean | `true` にすると、定義ファイルに存在しないラベルをリポジトリから削除しない |
 
 ## Secrets
 
 | 名前 | 必須 | 説明 |
 |------|------|------|
-| `github_token` | 任意 | ラベルを同期するためのGitHubトークン。未指定の場合は `github.token` を使用。`source_repository` が別のプライベートリポジトリの場合は必須 |
+| `gh_token` | 任意 | ラベルを同期するためのGitHubトークン。未指定の場合は `github.token` を使用。`source_repository` が別のプライベートリポジトリの場合は必須 |
 
 ## 利用例
 
@@ -52,7 +52,6 @@ name: github-label-sync
 on:
   push:
     paths:
-      - .github/labels/**
       - .github/workflows/github-label-sync.yaml
   workflow_dispatch:
 
@@ -72,7 +71,7 @@ jobs:
 
 ## ラベルファイルの構成
 
-ラベル定義ファイルは `.github/labels/` ディレクトリに配置します。
+`yuzu441/workflows` リポジトリで管理しているラベル定義ファイルは以下の通りです。
 
 | ファイル | 内容 |
 |---------|------|
