@@ -5,7 +5,7 @@ inputs:
     default: "false"
     description: Allow additional labels in the repository, and don't delete them.
     required: false
-  github_token:
+  gh_token:
     default: ${{ github.token }}
     description: GitHub access token to sync labels.
     required: false
@@ -22,7 +22,7 @@ runs:
   steps:
     - uses: actions/checkout@v6
       with:
-        token: ${{ inputs.github_token }}
+        token: ${{ inputs.gh_token }}
         repository: ${{ inputs.source_repository }}
         sparse-checkout: .github/labels
         path: .label-source
@@ -45,7 +45,7 @@ runs:
       with:
         config-file: ${{ steps.merge.outputs.config_file }}
         delete-other-labels: ${{ inputs.allow_added_labels == 'false' }}
-        token: ${{ inputs.github_token }}
+        token: ${{ inputs.gh_token }}
 branding:
   color: orange
   icon: refresh-cw

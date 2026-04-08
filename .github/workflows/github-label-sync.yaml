@@ -19,7 +19,7 @@ on:
         required: false
         type: boolean
     secrets:
-      github_token:
+      gh_token:
         description: |
           GitHub access token to sync labels. Defaults to github.token if not provided.
           Required when source_repository is a private repository other than the caller.
@@ -32,10 +32,11 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-slim
+    timeout-minutes: 5
     steps:
       - uses: yuzu441/workflows/.github/actions/github-label-sync-action@main
         with:
           source_paths: ${{ inputs.source_paths }}
           source_repository: ${{ inputs.source_repository }}
           allow_added_labels: ${{ inputs.allow_added_labels }}
-          github_token: ${{ secrets.github_token || github.token }}
+          gh_token: ${{ secrets.gh_token || github.token }}
